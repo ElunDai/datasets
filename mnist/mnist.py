@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 #==============================
 #    Author: Elun Dai
-#    Last modified: 2018-06-22 01:53
+#    Last modified: 2018-06-24 11:20
 #    Filename: mnist.py
 #    Description:
 #    see:
@@ -26,9 +26,9 @@ try:
 except ImportError:
     from urlparse import urljoin
 
-DEFAULT_DIR = '/tmp/datasets/MNIST/'
+DIRECTORY = '/tmp/datasets/MNIST/'
 
-def download_mnist(filename, directory=DEFAULT_DIR):
+def download_mnist(filename, directory=DIRECTORY):
     if os.path.exists(directory) is False:
         os.makedirs(directory)
 
@@ -39,7 +39,7 @@ def download_mnist(filename, directory=DEFAULT_DIR):
         urlretrieve(dataset_url, target)
         print('file have been saved to', target)
 
-def get_mnist(directory=DEFAULT_DIR):
+def get_mnist(directory=DIRECTORY):
     """Return train_images, train_labels, test_images, test_labels of MNIST dataset
     Parameters
     ----------
@@ -47,7 +47,7 @@ def get_mnist(directory=DEFAULT_DIR):
 
     Examples
     ----------
-    train_X, train_y, test_X, test_y = get_mnist()
+    X_train, y_train, X_test, y_test = get_mnist()
     """
 #     for filename in ['train-images.idx3-ubyte', 'train-labels.idx1-ubyte', 't10k-images.idx3-ubyte', 't10k-labels.idx1-ubyte']:
 #         file_path = os.path.join(directory, filename)
