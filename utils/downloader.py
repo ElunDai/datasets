@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 #==============================
 #    Author: Elun Dai
-#    Last modified: 2018-06-07 23:11
+#    Last modified: 2018-06-22 01:53
 #    Filename: downloader.py
 #    Description:
 #    
@@ -21,7 +21,7 @@ import re
 from six.moves.urllib.error import HTTPError
 from six.moves.urllib.error import URLError
 from six.moves.urllib.request import urlopen
-from generic_utils import Progbar
+from .generic_utils import Progbar
 
 try:
 #     from urllib.request import urlretrieve
@@ -35,17 +35,40 @@ except ImportError:
 
 DEFAULT_DIR = '/tmp/datasets'
 
-def get_dataset(urls=None, base_url=None, filenames=None, directory=DEFAULT_DIR):
+def get_dataset(urls=None, base_url=None, filenames=None, directory=None, md5_hashs=None, extract=False):
+    """get_dataset(urls=None, base_url=None, filenames=None, directory=DEFAULT_DIR):
+    download dataset from urls or base_url + filenames relatively.
+
+    arguements
+    ------------
+    urls: The urls to be downloaded.
+    base_url: The base url of each filenames.
+    filenames: Using with base_url, the files to be downloaded.
+    directory: The directory path to store the dataset. If not exists, it would be created.
+               It would set to '/tmp/datasets' by default.
+    """
+    if directory is None:
+        directory = DEFAULT_DIR
+
     if os.path.exists(directory) is False:
         os.makedirs(directory)
 
-    target = os.path.join(directory, filename)
-    if urls is None and ( basename and filenames ) is not None:
+    if urls is None and ( base_url and filenames ) is not None:
+        urls = list()
         for filename in filenames:
             urls.append(base_url + filename)
 
-    for url in urls:
-        download(url, directory)
+    if isinstance(urls, str):
+        urls = [urls]
+
+    if  md5_hashs is None:
+        md5_hashs = [None] * len(urls)
+    
+    fpaths = list()
+    for url, md5_hash in zip(urls, md5_hashs):
+        fpath = download(url, directory, md5_hash, extract=extract)
+        fpaths.append(fpath)
+    return fpaths
 
 def download(url,
              directory,
@@ -54,6 +77,9 @@ def download(url,
              hash_algorithm='auto',
              extract=False,
              archive_format='auto'):
+
+    filename = os.path.basename(url)
+    fpath = os.path.join(directory, filename)
 
     download = False
     if os.path.exists(fpath):
@@ -69,20 +95,45 @@ def download(url,
         download = True
 
     if download:
-        print('Downloading data from', origin)
+
+        class ProgressTracker(object):
+            # Maintain progbar for the lifetime of download.
+            # This design was chosen for Python 2.7 compatibility.
+            progbar = None
+
+        def dl_progress(count, block_size, total_size):
+            if ProgressTracker.progbar is None:
+                if total_size is -1:
+                    total_size = None
+                ProgressTracker.progbar = Progbar(total_size)
+            else:
+                ProgressTracker.progbar.update(count * block_size)
+
+        print('Downloading data from', url)
 
         error_msg = 'URL fetch failure on {}: {} -- {}'
         try:
             try:
-                urlretrieve(origin, fpath, dl_progress)
+                urlretrieve(url, fpath, dl_progress)
             except URLError as e:
-                raise Exception(error_msg.format(origin, e.errno, e.reason))
+                raise Exception(error_msg.format(url, e.errno, e.reason))
             except HTTPError as e:
-                raise Exception(error_msg.format(origin, e.code, e.msg))
+                raise Exception(error_msg.format(url, e.code, e.msg))
         except (Exception, KeyboardInterrupt) as e:
             if os.path.exists(fpath):
                 os.remove(fpath)
             raise
+        ProgressTracker.progbar = None
+
+    if extract:
+        ret = _extract_archive(fpath, directory, archive_format)
+        if ret is True:
+            print("extracted to", directory)
+        else:
+            print("extracting failed!")
+
+
+    return fpath
 
 def _hash_file(fpath, algorithm='sha256', chunk_size=65535):
     """Calculates a file sha256 or md5 hash.
@@ -186,7 +237,6 @@ def _extract_archive(file_path, path='.', archive_format='auto'):
                     raise
             return True
     return False
-
 
 def get_file(origin,
              fname=None,

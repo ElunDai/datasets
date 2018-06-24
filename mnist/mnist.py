@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 #==============================
 #    Author: Elun Dai
-#    Last modified: 2018-06-07 11:14
+#    Last modified: 2018-06-22 01:53
 #    Filename: mnist.py
 #    Description:
 #    see:
@@ -16,6 +16,7 @@ import array
 import functools
 import operator
 import os
+from ..utils import get_dataset
 try:
     from urllib.request import urlretrieve
 except ImportError:
@@ -43,20 +44,33 @@ def get_mnist(directory=DEFAULT_DIR):
     Parameters
     ----------
     directory : the directory contained MNIST dataset binary file
+
+    Examples
+    ----------
+    train_X, train_y, test_X, test_y = get_mnist()
     """
+#     for filename in ['train-images.idx3-ubyte', 'train-labels.idx1-ubyte', 't10k-images.idx3-ubyte', 't10k-labels.idx1-ubyte']:
+#         file_path = os.path.join(directory, filename)
+#         if os.path.exists(file_path): # binary file
+#             fopen = open
+#         else: # gzip file
+#             filename = filename.replace('.', '-') + '.gz'
+#             file_path = os.path.join(directory, filename)
+#             fopen = gzip.open
+#             if os.path.exists(file_path) is False:
+#                 download_mnist(filename, directory)
+        # read file
+    fpaths = get_dataset(base_url='http://yann.lecun.com/exdb/mnist/',
+                 filenames=['train-images-idx3-ubyte.gz', 'train-labels-idx1-ubyte.gz', 't10k-images-idx3-ubyte.gz', 't10k-labels-idx1-ubyte.gz'],
+                 extract=False)
+
     mnist = list() 
-    for filename in ['train-images.idx3-ubyte', 'train-labels.idx1-ubyte', 't10k-images.idx3-ubyte', 't10k-labels.idx1-ubyte']:
-        file_path = os.path.join(directory, filename)
-        if os.path.exists(file_path): # binary file
+    for fpath in fpaths:
+        if os.path.exists(os.path.splitext(fpath)[0]): # binary file
             fopen = open
         else: # gzip file
-            filename = filename.replace('.', '-') + '.gz'
-            file_path = os.path.join(directory, filename)
             fopen = gzip.open
-            if os.path.exists(file_path) is False:
-                download_mnist(filename, directory)
-        # read file
-        with fopen(file_path, 'rb') as fd:
+        with fopen(fpath, 'rb') as fd:
             mnist.append(parse_idx(fd))
 
     return mnist
