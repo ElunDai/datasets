@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 #==============================
 #    Author: Elun Dai
-#    Last modified: 2018-06-22 01:53
+#    Last modified: 2018-06-24 13:54
 #    Filename: downloader.py
 #    Description:
 #    
@@ -127,10 +127,10 @@ def download(url,
 
     if extract:
         ret = _extract_archive(fpath, directory, archive_format)
-        if ret is True:
-            print("extracted to", directory)
-        else:
-            print("extracting failed!")
+#         if ret is True:
+#             print("extracted to", directory)
+#         else:
+#             print("extracting failed!")
 
 
     return fpath
@@ -225,16 +225,23 @@ def _extract_archive(file_path, path='.', archive_format='auto'):
 
         if is_match_fn(file_path):
             with open_fn(file_path) as archive:
-                try:
-                    archive.extractall(path)
-                except (tarfile.TarError, RuntimeError,
-                        KeyboardInterrupt):
-                    if os.path.exists(path):
-                        if os.path.isfile(path):
-                            os.remove(path)
-                        else:
-                            shutil.rmtree(path)
-                    raise
+                # check weather extracted or not
+                extracted = True
+                for fname in archive.getnames():
+                    if not os.path.exists(os.path.join(path, fname)):
+                        extracted = False
+                if not extracted:
+                    try:
+                        archive.extractall(path)
+                        print('extracted to', path)
+                    except (tarfile.TarError, RuntimeError,
+                            KeyboardInterrupt):
+                        if os.path.exists(path):
+                            if os.path.isfile(path):
+                                os.remove(path)
+                            else:
+                                shutil.rmtree(path)
+                        raise
             return True
     return False
 
