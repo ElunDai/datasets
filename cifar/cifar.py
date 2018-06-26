@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 #==============================
 #    Author: Elun Dai
-#    Last modified: 2018-06-24 14:18
+#    Last modified: 2018-06-25 01:06
 #    Filename: cifar.py
 #    Description:
 #    
@@ -84,13 +84,15 @@ def get_cifar100(directory=DIRECTORY, channel="rgb"):
     train = load_pickle(os.path.join(fdir, 'train'))
     test = load_pickle(os.path.join(fdir, 'test'))
     X_train = train.get('data').reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
-    if channel == 'rgb':
-        X_train = X_train[:, :, :, ::-1] # BGR to RGB
+    if channel is not 'rgb':
+        X_train = X_train[:, :, :, ::-1] # RGB to BGR
     y_train_fl = train.get('fine_labels')
 #     y_train_cl = train.get('coarse_labels')
 
     test = load_pickle(os.path.join(fdir, 'test'))
     X_test = test.get('data').reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1).astype("float")
+    if channel is not 'rgb':
+        X_test = X_test[:, :, :, ::-1] # RGB to BGR
     y_test_fl = test.get('fine_labels')
 #     y_test_cl = test.get('coarse_labels')
 
