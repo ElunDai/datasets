@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 #==============================
 #    Author: Elun Dai
-#    Last modified: 2018-06-24 13:54
+#    Last modified: 2018-06-29 14:48
 #    Filename: downloader.py
 #    Description:
 #    
@@ -109,7 +109,7 @@ def download(url,
             else:
                 ProgressTracker.progbar.update(count * block_size)
 
-        print('Downloading data from', url)
+        print('Downloading data from {} to directory {}'.format(url, fpath))
 
         error_msg = 'URL fetch failure on {}: {} -- {}'
         try:

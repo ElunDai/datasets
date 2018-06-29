@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 #==============================
 #    Author: Elun Dai
-#    Last modified: 2018-06-25 01:06
+#    Last modified: 2018-06-29 14:52
 #    Filename: cifar.py
 #    Description:
 #    
@@ -13,8 +13,9 @@ import numpy as np
 import platform
 import pickle
 from ..utils import downloader
+from ..settings import BASE_DIRECTORY
 
-DIRECTORY = '/tmp/datasets/cifar'
+DIRECTORY = os.path.join(os.path.expanduser(BASE_DIRECTORY), 'cifar/')
 
 # fine label to coarse label
 CIFAR100_LABEL_DECT = dict([(4, 0), (30, 0), (55, 0), (72, 0), (95, 0),

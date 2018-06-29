@@ -3,7 +3,7 @@
 # -*- coding: utf-8 -*-
 #==============================
 #    Author: Elun Dai
-#    Last modified: 2018-06-24 11:20
+#    Last modified: 2018-06-29 14:52
 #    Filename: mnist.py
 #    Description:
 #    see:
@@ -17,27 +17,28 @@ import functools
 import operator
 import os
 from ..utils import get_dataset
-try:
-    from urllib.request import urlretrieve
-except ImportError:
-    from urllib import urlretrieve  # py2
-try:
-    from urllib.parse import urljoin
-except ImportError:
-    from urlparse import urljoin
+from ..settings import BASE_DIRECTORY
+# try:
+#     from urllib.request import urlretrieve
+# except ImportError:
+#     from urllib import urlretrieve  # py2
+# try:
+#     from urllib.parse import urljoin
+# except ImportError:
+#     from urlparse import urljoin
 
-DIRECTORY = '/tmp/datasets/MNIST/'
+DIRECTORY = os.path.join(os.path.expanduser(BASE_DIRECTORY), 'MNIST/')
 
-def download_mnist(filename, directory=DIRECTORY):
-    if os.path.exists(directory) is False:
-        os.makedirs(directory)
-
-    target = os.path.join(directory, filename)
-    if os.path.exists(target) is False:
-        dataset_url = 'http://yann.lecun.com/exdb/mnist/' + filename
-        print('download:', dataset_url)
-        urlretrieve(dataset_url, target)
-        print('file have been saved to', target)
+# def download_mnist(filename, directory=DIRECTORY):
+#     if os.path.exists(directory) is False:
+#         os.makedirs(directory)
+# 
+#     target = os.path.join(directory, filename)
+#     if os.path.exists(target) is False:
+#         dataset_url = 'http://yann.lecun.com/exdb/mnist/' + filename
+#         print('download:', dataset_url)
+#         urlretrieve(dataset_url, target)
+#         print('file have been saved to', target)
 
 def get_mnist(directory=DIRECTORY):
     """Return train_images, train_labels, test_images, test_labels of MNIST dataset
