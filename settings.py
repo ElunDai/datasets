@@ -3,11 +3,10 @@
 # -*- coding: utf-8 -*-
 #==============================
 #    Author: Elun Dai
-#    Last modified: 2018-06-29 14:56
+#    Last modified: 2018-07-09 14:36
 #    Filename: settings.py
 #    Description:
 #    
 #=============================#
 
-# BASE_DIRECTORY = '/tmp/datasets/'
-BASE_DIRECTORY = '~/my/packages/python/datasets/data/'
+BASE_DIRECTORY = '/tmp/datasets/'
